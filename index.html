@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14Ktorce CRM v8</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;background:#F0F2F5;color:#1A1A2E;display:flex;height:100vh;overflow:hidden;}
+#sb{width:210px;min-width:210px;background:#1C2333;display:flex;flex-direction:column;height:100vh;box-shadow:2px 0 12px rgba(0,0,0,.15);}
+.logo{padding:20px 16px;border-bottom:1px solid #2A3348;}
+.logo-icon{width:40px;height:40px;background:#D4A830;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:13px;vertical-align:middle;margin-right:10px;}
+.logo-name{display:inline-block;vertical-align:middle;}
+.logo-name b{display:block;color:#D4A830;font-size:15px;}
+.logo-name small{color:#8A9BB5;font-size:10px;}
+nav{padding:12px 8px;flex:1;}
+.nb{display:block;width:100%;text-align:left;padding:10px 12px;border:none;background:transparent;color:#8A9BB5;cursor:pointer;font-size:13px;border-radius:7px;margin-bottom:2px;transition:all .15s;}
+.nb:hover{background:#253044;color:#C8D6E8;}
+.nb.on{background:#253044;color:#D4A830;border-left:3px solid #D4A830;font-weight:700;}
+.sb-foot{padding:12px 16px;font-size:10px;color:#3D4F6A;}
+#nube-status{font-size:10px;padding:0 16px 14px;}
+#main{flex:1;overflow-y:auto;height:100vh;}
+.pg{display:none;padding:28px 32px;max-width:1100px;}
+.pg.on{display:block;}
+h1{font-size:24px;font-weight:700;color:#1A1A2E;margin-bottom:4px;}
+.sub{font-size:12px;color:#7A8A9E;margin-bottom:22px;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.kpi{background:#fff;border:1px solid #E0E3EA;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.kpi-v{font-size:26px;font-weight:800;line-height:1;}
+.kpi-l{font-size:11px;color:#8A9BB5;margin-top:6px;text-transform:uppercase;letter-spacing:.5px;}
+.card{background:#fff;border:1px solid #E0E3EA;border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.ctit{font-size:11px;font-weight:700;color:#B8920A;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.stit{font-size:12px;font-weight:700;color:#B8920A;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 12px;text-align:left;font-size:10px;color:#8A9BB5;font-weight:700;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #E8EBF0;background:#F8F9FB;}
+tr{border-bottom:1px solid #F0F2F5;}
+tr:hover{background:#FAFBFC;}
+td{padding:11px 12px;font-size:13px;color:#2D3748;}
+.fbadge{background:#FFF8E1;color:#B8920A;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #F0D060;}
+.est{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.est-PE{background:#FFF3CD;color:#856404;}.est-AP{background:#D1FAE5;color:#065F46;}
+.est-PR{background:#DBEAFE;color:#1E40AF;}.est-EN{background:#EDE9FE;color:#5B21B6;}
+.est-CA{background:#FEE2E2;color:#991B1B;}
+.ebadge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.eb-ok{background:#D1FAE5;color:#065F46;}.eb-warn{background:#FFF3CD;color:#856404;}
+.eb-hoy{background:#FFF8E1;color:#B8920A;}.eb-venc{background:#FEE2E2;color:#991B1B;}
+.fgrid{display:grid;gap:10px;}
+.flbl{font-size:10px;color:#8A9BB5;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:3px;}
+.flbl-gold{font-size:10px;color:#B8920A;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:3px;}
+input,select{width:100%;background:#F8F9FB;border:1px solid #D8DCE4;border-radius:7px;color:#1A1A2E;padding:8px 11px;font-size:13px;outline:none;font-family:Arial,sans-serif;transition:border-color .15s;}
+input:focus,select:focus{border-color:#D4A830;background:#fff;box-shadow:0 0 0 3px rgba(212,168,48,.1);}
+.gold-input{border-color:#D4A830 !important;color:#B8920A;font-weight:700;}
+.gold-input:focus{box-shadow:0 0 0 3px rgba(212,168,48,.15);}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.rrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F0F2F5;font-size:13px;}
+.rrow:last-child{border-bottom:none;}
+.rl{color:#8A9BB5;}.rv{color:#2D3748;font-weight:500;}.ra{color:#B8920A;font-weight:700;}.rg{color:#16a34a;font-weight:700;}
+.divhr{border-top:1px solid #E8EBF0;margin:8px 0;}
+.trow{display:flex;justify-content:space-between;padding:10px 0 0;font-size:18px;font-weight:800;}
+.tv{color:#B8920A;}
+.res-box{background:#F8F9FB;border:1px solid #E0E3EA;border-radius:10px;padding:14px;margin-top:12px;}
+.warn-box{background:#FFF8E1;border-left:3px solid #D4A830;padding:8px 12px;font-size:12px;color:#7A5800;margin-top:10px;border-radius:0 7px 7px 0;}
+.btn-g{width:100%;margin-top:12px;background:#1C2333;color:#D4A830;border:none;border-radius:8px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;}
+.btn-g:hover{opacity:.88;}.btn-g:disabled{opacity:.35;cursor:not-allowed;}
+.btn-gold{width:100%;margin-top:12px;background:linear-gradient(135deg,#D4A830,#A0862A);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;}
+.btn-ver{background:#FFF8E1;color:#B8920A;border:1px solid #D4A830;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:700;}
+.btn-del{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;border-radius:6px;padding:4px 9px;font-size:13px;cursor:pointer;}
+.btn-bk{background:#fff;border:1px solid #D8DCE4;color:#7A8A9E;border-radius:7px;padding:7px 14px;font-size:13px;cursor:pointer;margin-bottom:18px;}
+.btn-bk:hover{border-color:#D4A830;color:#B8920A;}
+.btn-x{background:#FEE2E2;color:#991B1B;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:12px;margin-left:8px;}
+.btn-lnk{background:none;border:none;color:#D4A830;cursor:pointer;font-size:13px;padding:8px 0;text-decoration:underline;display:block;}
+.sel-est{background:#F8F9FB;border:1px solid #D8DCE4;color:#2D3748;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;width:auto;}
+.btn-pdf{background:linear-gradient(135deg,#D4A830,#A0862A);color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;}
+.hoja-acciones{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.irow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F0F2F5;}
+.iname{font-size:13px;color:#1A1A2E;}.isub{font-size:11px;color:#8A9BB5;margin-top:2px;}
+.ipr{color:#B8920A;font-weight:700;font-size:14px;}
+.ibadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:5px;}
+.ib-et{background:#D1FAE5;color:#065F46;}.ib-mn{background:#EDE9FE;color:#5B21B6;}.ib-cm{background:#DBEAFE;color:#1E40AF;}
+.tab-toggle{display:flex;gap:4px;background:#F0F2F5;border-radius:10px;padding:4px;width:fit-content;margin-bottom:18px;}
+.tab-btn{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;background:transparent;color:#8A9BB5;transition:all .2s;}
+.tab-btn.on{background:#1C2333;color:#D4A830;}
+.precio-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1px solid #E8EBF0;border-radius:9px;margin-bottom:8px;}
+.precio-info{display:flex;align-items:center;gap:10px;flex:1;}
+.pdot{width:8px;height:8px;border-radius:50%;background:#D4A830;flex-shrink:0;}
+.pname{font-size:13px;color:#1A1A2E;font-weight:500;}
+.precio-ctrl{display:flex;align-items:center;gap:8px;}
+.precio-display{font-size:13px;color:#B8920A;font-weight:700;min-width:60px;text-align:right;}
+.btn-edit{background:#FFF8E1;color:#B8920A;border:1px solid #E8D080;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:600;}
+.btn-save{background:linear-gradient(135deg,#D4A830,#A0862A);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-weight:700;}
+.btn-cancel{background:#F0F2F5;color:#7A8A9E;border:1px solid #D8DCE4;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;}
+.input-precio{width:75px;background:#fff;border:1px solid #D4A830;border-radius:6px;color:#B8920A;padding:4px 8px;font-size:13px;font-weight:700;outline:none;text-align:right;}
+.cat-nota{font-size:11px;color:#7A8A9E;margin-bottom:14px;padding:8px 12px;background:#FFF8E1;border-radius:6px;border-left:3px solid #D4A830;}
+.hint{color:#A0AABB;font-size:13px;padding:8px 0;}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;}
+.srow{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F2F5;font-size:13px;}
+.sk{color:#7A8A9E;}.sv{color:#B8920A;font-weight:600;}
+#flash{position:fixed;top:16px;right:16px;background:#1C2333;border:1px solid #D4A830;color:#D4A830;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:700;z-index:9999;display:none;box-shadow:0 6px 24px rgba(0,0,0,.2);}
+#loading-overlay{position:fixed;inset:0;background:rgba(240,242,245,.92);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.loading-spinner{width:44px;height:44px;border:3px solid #E0E3EA;border-top:3px solid #D4A830;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#print-footer{display:none;}
+@media print{
+  #sb,#flash,.hoja-acciones,.sel-est,.btn-bk,.btn-del{display:none !important;}
+  body{background:#fff !important;display:block !important;height:auto !important;margin:0 !important;padding:0 !important;}
+  #main{height:auto !important;overflow:visible !important;}
+  .pg{display:none !important;padding:0 !important;}
+  #pg-cotizaciones{display:block !important;padding:0 !important;max-width:100% !important;}
+  #cot-sub,#cot-lista{display:none !important;}
+  #cot-hoja{display:block !important;}
+  .card{background:#fff !important;border:none !important;border-radius:0 !important;padding:0 !important;margin:0 !important;box-shadow:none !important;}
+  #hoja-contenido{padding:0 !important;}
+  #hoja-contenido table{font-size:9px !important;table-layout:fixed !important;width:100% !important;}
+  #hoja-contenido td,#hoja-contenido th{padding:4px 5px !important;font-size:9px !important;}
+  #hoja-contenido tbody tr{height:18px !important;}
+  #hoja-contenido table{margin-bottom:4px !important;}
+  #print-footer{display:block !important;margin-top:6px;padding-top:6px;border-top:2px solid #B8920A;font-size:8px;color:#aaa;text-align:center;}
+  #hoja-contenido{page-break-inside:avoid;}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  @page{size:A4 portrait;margin:8mm 10mm;}
+}
+@media(max-width:768px){
+  body{flex-direction:column;height:auto;overflow:auto;}
+  #sb{width:100%;min-width:unset;height:auto;flex-direction:row;position:fixed;bottom:0;left:0;right:0;border-top:1px solid #2A3348;z-index:1000;padding:0;}
+  .logo,#nube-status,.sb-foot{display:none;}
+  nav{display:flex;flex-direction:row;padding:0;width:100%;}
+  .nb{flex:1;text-align:center;padding:10px 4px 8px;font-size:10px;border-radius:0;display:flex;flex-direction:column;align-items:center;gap:3px;border-left:none !important;border-top:2px solid transparent;}
+  .nb.on{border-top:2px solid #D4A830;border-left:none !important;}
+  #main{height:auto;padding-bottom:70px;}
+  .pg{padding:16px 14px;}
+  .kpi-row,.two,.three{grid-template-columns:1fr 1fr;}
+  .spec-grid{grid-template-columns:1fr;}
+  table{min-width:500px;}.card{overflow-x:auto;}
+  .tab-toggle{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div style="color:#7A8A9E;font-size:13px;">Conectando con la nube...</div>
+</div>
+
+<div id="sb">
+  <div class="logo">
+    <span class="logo-icon">14K</span>
+    <span class="logo-name"><b>14Ktorce</b><small>Etiquetas en Rollo</small></span>
+  </div>
+  <nav>
+    <button class="nb on" onclick="ir('dashboard')">&#9632; Dashboard</button>
+    <button class="nb" onclick="ir('cotizador')">&#127991; Cotizador</button>
+    <button class="nb" onclick="ir('cotizaciones')">&#128203; Cotizaciones</button>
+    <button class="nb" onclick="ir('catalogo')">&#128230; Catálogo</button>
+  </nav>
+  <div class="sb-foot">v8.0 · León, Gto.</div>
+  <div id="nube-status" style="color:#888;">&#9729; Conectando...</div>
+</div>
+
+<div id="main">
+
+<!-- DASHBOARD -->
+<div class="pg on" id="pg-dashboard">
+  <h1>Dashboard</h1>
+  <p class="sub" id="d-sub">Resumen operativo</p>
+  <div class="kpi-row">
+    <div class="kpi" style="border-top:3px solid #D4A830">
+      <div class="kpi-v" id="k-cots" style="color:#D4A830">0</div>
+      <div class="kpi-l">Cotizaciones realizadas</div>
+    </div>
+    <div class="kpi" style="border-top:3px solid #4caf82">
+      <div class="kpi-v" id="k-apro" style="color:#4caf82">0</div>
+      <div class="kpi-l">Aprobadas</div>
+    </div>
+    <div class="kpi" style="border-top:3px solid #7b9fe0">
+      <div class="kpi-v" id="k-ingreso" style="color:#7b9fe0">$0</div>
+      <div class="kpi-l">Ingreso total</div>
+    </div>
+    <div class="kpi" style="border-top:3px solid #16a34a">
+      <div class="kpi-v" id="k-utilidad" style="color:#16a34a">$0</div>
+      <div class="kpi-l">Utilidad total</div>
+    </div>
+  </div>
+  <div class="stit">Últimas cotizaciones</div>
+  <div class="card">
+    <table><thead><tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Entrega</th></tr></thead>
+    <tbody id="d-tabla"></tbody></table>
+  </div>
+  <button class="btn-lnk" onclick="ir('cotizaciones')">Ver todas las cotizaciones →</button>
+</div>
+
+<!-- COTIZADOR -->
+<div class="pg" id="pg-cotizador">
+  <h1>Cotizador</h1>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="ctit">Datos del cliente</div>
+    <div class="three">
+      <div><label class="flbl">Nombre / Empresa *</label><input id="c-nombre" type="text" placeholder="Ej. Juan García"></div>
+      <div><label class="flbl">Teléfono</label><input id="c-tel" type="tel" placeholder="477 000 0000"></div>
+      <div><label class="flbl">Proyecto</label><input id="c-proyecto" type="text" placeholder="Ej. Etiquetas Suplementos"></div>
+    </div>
+  </div>
+
+  <div class="tab-toggle">
+    <button class="tab-btn on" id="tab-auto" onclick="setTab('auto')">&#9889; Etiqueta en Rollo</button>
+    <button class="tab-btn" id="tab-costo" onclick="setTab('costo')">&#128178; Costo Manual</button>
+    <button class="tab-btn" id="tab-manual" onclick="setTab('manual')">&#9998; Ítem Extra</button>
+  </div>
+
+  <!-- TAB AUTO -->
+  <div id="modo-auto">
+    <div class="two">
+      <div class="card">
+        <div class="ctit">Calcular etiqueta</div>
+        <div class="fgrid">
+          <div><label class="flbl">Descripción</label><input id="c-desc" type="text" placeholder="Ej. Etiqueta Frente, Sabor Fresa..."></div>
+          <div><label class="flbl">Material + Acabado</label><select id="c-mat" onchange="calcAuto()"></select></div>
+          <div class="two" style="gap:8px;">
+            <div><label class="flbl">Lado corto (mm)</label><input id="c-a" type="number" placeholder="60" oninput="calcAuto()"></div>
+            <div><label class="flbl">Lado largo (mm)</label><input id="c-b" type="number" placeholder="90" oninput="calcAuto()"></div>
+          </div>
+          <div><label class="flbl">Cantidad</label><input id="c-qty" type="number" placeholder="5000" oninput="calcAuto()"></div>
+          <div>
+            <label class="flbl-gold">Le subo $ por pieza</label>
+            <input id="c-sube" class="gold-input" type="number" placeholder="Ej. 1.20" step="0.01" min="0" oninput="calcAuto()">
+            <div style="font-size:10px;color:#8A9BB5;margin-top:3px;">Costo calculado + este monto = precio al cliente</div>
+          </div>
+        </div>
+        <div id="res-auto"><p class="hint" style="margin-top:10px;">Completa los campos para ver el cálculo</p></div>
+        <button class="btn-g" id="btn-add-auto" onclick="agregarAuto()" disabled>+ Agregar a cotización</button>
+      </div>
+      <div id="panel-r"></div>
+    </div>
+  </div>
+
+  <!-- TAB COSTO MANUAL -->
+  <div id="modo-costo" style="display:none;">
+    <div class="two">
+      <div class="card">
+        <div class="ctit">Costo manual de etiqueta</div>
+        <div style="font-size:11px;color:#8A9BB5;margin-bottom:14px;padding:8px 12px;background:#F8F9FB;border-radius:6px;border-left:3px solid #D4A830;">
+          Usa esta sección cuando ya tienes el costo directo de tu proveedor
+        </div>
+        <div class="fgrid">
+          <div><label class="flbl">Descripción</label><input id="cm-desc" type="text" placeholder="Ej. Etiqueta Péptidos, Etiqueta Extintor..."></div>
+          <div class="two" style="gap:8px;">
+            <div><label class="flbl">Material</label><input id="cm-mat" type="text" placeholder="Ej. BOPP Metalizado"></div>
+            <div><label class="flbl">Acabado</label><input id="cm-acb" type="text" placeholder="Ej. Laminado Brillante"></div>
+          </div>
+          <div class="two" style="gap:8px;">
+            <div><label class="flbl">Medida (mm)</label><input id="cm-tam" type="text" placeholder="Ej. 30×60"></div>
+            <div><label class="flbl">Cantidad</label><input id="cm-qty" type="number" placeholder="1000" oninput="calcCosto()"></div>
+          </div>
+          <div>
+            <label class="flbl-gold">Costo por pieza ($)</label>
+            <input id="cm-costo" class="gold-input" type="number" placeholder="Ej. 0.60" step="0.01" min="0" oninput="calcCosto()">
+          </div>
+          <div>
+            <label class="flbl-gold">Le subo $ por pieza</label>
+            <input id="cm-sube" class="gold-input" type="number" placeholder="Ej. 0.60" step="0.01" min="0" oninput="calcCosto()">
+            <div style="font-size:10px;color:#8A9BB5;margin-top:3px;">Costo + este monto = precio al cliente</div>
+          </div>
+        </div>
+        <div id="res-costo"><p class="hint" style="margin-top:10px;">Ingresa el costo y cuánto le subes</p></div>
+        <button class="btn-g" id="btn-add-costo" onclick="agregarCosto()" disabled>+ Agregar a cotización</button>
+      </div>
+      <div id="panel-r-c"></div>
+    </div>
+  </div>
+
+  <!-- TAB MANUAL -->
+  <div id="modo-manual" style="display:none;">
+    <div class="two">
+      <div class="card">
+        <div class="ctit">Agregar ítem extra</div>
+        <div class="fgrid">
+          <div><label class="flbl">Descripción *</label><input id="m-desc" type="text" placeholder="Ej. Diseño, Flete, Caja, Vial..."></div>
+          <div class="two" style="gap:8px;">
+            <div><label class="flbl">Material / Tipo</label><input id="m-mat" type="text" placeholder="Ej. Servicio, Envío..."></div>
+            <div><label class="flbl">Acabado (opcional)</label><input id="m-acb" type="text" placeholder="Ej. Digital, Express..."></div>
+          </div>
+          <div class="two" style="gap:8px;">
+            <div><label class="flbl">Unidad</label><input id="m-unidad" type="text" placeholder="Ej. pza, servicio, caja, lote, diseño"></div>
+            <div><label class="flbl">Cantidad</label><input id="m-qty" type="number" placeholder="1" oninput="calcManual()"></div>
+          </div>
+          <div>
+            <label class="flbl-gold" id="m-precio-lbl">Precio total ($) *</label>
+            <input id="m-precio" class="gold-input" type="number" placeholder="Ej. 500.00" step="0.01" min="0" oninput="calcManual()">
+          </div>
+        </div>
+        <div id="res-manual"><p class="hint" style="margin-top:10px;">Ingresa los datos para ver el total</p></div>
+        <button class="btn-g" onclick="agregarManual()">+ Agregar a cotización</button>
+      </div>
+      <div id="panel-r-m"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COTIZACIONES -->
+<div class="pg" id="pg-cotizaciones">
+  <h1>Control de Cotizaciones</h1>
+  <p class="sub" id="cot-sub">0 cotizaciones</p>
+  <div id="cot-lista"></div>
+  <div id="cot-hoja"></div>
+</div>
+
+<!-- CATÁLOGO -->
+<div class="pg" id="pg-catalogo">
+  <h1>Catálogo de Materiales</h1>
+  <p class="sub">Edita los precios · Se guardan automáticamente en la nube</p>
+  <div class="cat-nota">&#9998; Haz clic en <strong style="color:#D4A830">Editar</strong> para modificar el precio por metro lineal.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="lista-materiales"></div>
+  <div class="card" style="margin-top:16px;">
+    <div class="ctit">Especificaciones técnicas</div>
+    <div class="spec-grid">
+      <div class="srow"><span class="sk">Ancho útil de impresión</span><span class="sv">320 mm</span></div>
+      <div class="srow"><span class="sk">Separación entre etiquetas</span><span class="sv">4 mm (lado corto al ancho)</span></div>
+      <div class="srow"><span class="sk">Paso del rollo</span><span class="sv">Lado largo + 5 mm</span></div>
+      <div class="srow"><span class="sk">Resolución</span><span class="sv">1200 dpi</span></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var MAT_DEFAULT=[
+  {id:'bopp-bco-bri',n:'BOPP Blanco — Brillante',           p:45},
+  {id:'bopp-bco-mat',n:'BOPP Blanco — Mate',                p:50},
+  {id:'bopp-bco-uv', n:'BOPP Blanco — Barniz UV',           p:50},
+  {id:'bopp-bco-tac',n:'BOPP Blanco — Barniz Táctil',       p:55},
+  {id:'bopp-met-bri',n:'BOPP Metalizado — Brillante',       p:64},
+  {id:'bopp-met-mat',n:'BOPP Metalizado — Mate',            p:64},
+  {id:'bopp-met-uv', n:'BOPP Metalizado — Barniz UV',       p:69},
+  {id:'bopp-met-tac',n:'BOPP Metalizado — Barniz Táctil',   p:74},
+  {id:'bopp-tr-bri', n:'BOPP Transparente — Brillante',     p:54},
+  {id:'bopp-tr-mat', n:'BOPP Transparente — Mate',          p:59},
+  {id:'bopp-tr-uv',  n:'BOPP Transparente — Barniz UV',     p:59},
+  {id:'bopp-tr-tac', n:'BOPP Transparente — Barniz Táctil', p:64},
+  {id:'holo-bri',    n:'Holográfico — Brillante',           p:74},
+  {id:'holo-uv',     n:'Holográfico — Barniz UV',           p:79},
+  {id:'holo-tac',    n:'Holográfico — Barniz Táctil',       p:84},
+];
+var MATERIALES=MAT_DEFAULT.map(function(m){return Object.assign({},m);});
+var cots=[],items=[],calcA=null,calcC=null;
+var ESTADOS=['Pendiente','Aprobada','En producción','Entregada','Cancelada'];
+var ESTCLASS={Pendiente:'est-PE',Aprobada:'est-AP','En producción':'est-PR',Entregada:'est-EN',Cancelada:'est-CA'};
+var ESTADOS_ACTIVOS=['Aprobada','En producción','Entregada'];
+
+var JB_BIN='69ea48a036566621a8e444e6';
+var JB_KEY='$2a$10$CFr8x.ylD.71Kk76sSCsI.ZFE2q.7aLo2ARGn1VylwJJGY/DnD8tS';
+var JB_URL='https://api.jsonbin.io/v3/b/'+JB_BIN;
+var _gd=false,_pd=false;
+
+function estadoNube(s){var el=document.getElementById('nube-status');if(!el)return;if(s==='ok'){el.innerHTML='&#9729; Sincronizado';el.style.color='#4caf82';}else if(s==='err'){el.innerHTML='&#9888; Error';el.style.color='#e87b7b';}else{el.innerHTML='&#9729; Guardando...';el.style.color='#888';}}
+function guardarLS(){
+  if(_gd){_pd=true;return;}_gd=true;estadoNube('saving');
+  fetch(JB_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Access-Key':JB_KEY,'X-Bin-Versioning':'false'},
+    body:JSON.stringify({cots:cots,materiales:MATERIALES.map(function(m){return{id:m.id,p:m.p};})})})
+  .then(function(r){return r.json();})
+  .then(function(){_gd=false;estadoNube('ok');if(_pd){_pd=false;guardarLS();}})
+  .catch(function(){_gd=false;estadoNube('err');});
+}
+function cargarLS(){estadoNube('saving');document.getElementById('loading-overlay').style.display='flex';intentar(1);}
+function intentar(n){
+  fetch(JB_URL+'/latest',{method:'GET',headers:{'X-Access-Key':JB_KEY,'X-Bin-Meta':'false'}})
+  .then(function(r){if(!r.ok)throw new Error();return r.json();})
+  .then(function(data){
+    var d=data.record||data;
+    if(d){
+      if(Array.isArray(d.cots)&&d.cots.length>0)cots=d.cots;
+      if(d.materiales)d.materiales.forEach(function(m){
+        var f=MATERIALES.find(function(x){return x.id===m.id;});
+        if(f&&m.p>=10)f.p=m.p;
+      });
+    }
+    estadoNube('ok');document.getElementById('loading-overlay').style.display='none';
+    llenarSelects();renderDash();
+  })
+  .catch(function(){
+    if(n<3)setTimeout(function(){intentar(n+1);},2000);
+    else{estadoNube('err');document.getElementById('loading-overlay').innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:44px">&#9888;</div><div style="font-size:16px;font-weight:700;margin:12px 0;color:#1A1A2E;">Sin conexión</div><button onclick="location.reload()" style="background:#D4A830;color:#000;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:800;cursor:pointer;">&#8635; Reintentar</button></div>';document.getElementById('loading-overlay').style.display='flex';}
+  });
+}
+
+function hoy(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+function fmt(n){return Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtD(n){return'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function flash(msg){var el=document.getElementById('flash');el.textContent=msg;el.style.display='block';clearTimeout(flash.t);flash.t=setTimeout(function(){el.style.display='none';},2800);}
+function badge(e){return'<span class="est '+(ESTCLASS[e]||'est-PE')+'">'+e+'</span>';}
+function parseFecha(s){var p=s.split('/');return new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]),0,0,0,0);}
+function sumarDH(d,n){var x=new Date(d.getTime());x.setHours(0,0,0,0);var a=0;while(a<n){x=new Date(x.getTime()+86400000);var w=x.getDay();if(w!==0&&w!==6)a++;}return x;}
+function diasRest(h){var hd=new Date();hd.setHours(0,0,0,0);var m=new Date(h.getTime());m.setHours(0,0,0,0);if(hd.getTime()===m.getTime())return 0;var sg=m>hd?1:-1,c=new Date(hd.getTime()),ct=0;while(c.getTime()!==m.getTime()){c=new Date(c.getTime()+sg*86400000);var w=c.getDay();if(w!==0&&w!==6)ct+=sg;}return ct;}
+function badgeEnt(c){if(c.estado!=='Aprobada'&&c.estado!=='En producción')return'';var b=c.fechaAprobacion?parseFecha(c.fechaAprobacion):parseFecha(c.fecha);var fl=sumarDH(b,9),r=diasRest(fl);var fs=fl.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});var cls,txt;if(r<0){cls='eb-venc';txt='Vencido '+Math.abs(r)+'d';}else if(r===0){cls='eb-hoy';txt='Entrega HOY';}else if(r<=2){cls='eb-warn';txt='Faltan '+r+'d ('+fs+')';}else{cls='eb-ok';txt='Faltan '+r+'d ('+fs+')';}return'<span class="ebadge '+cls+'">'+txt+'</span>';}
+
+function ir(v){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('pg-'+v).classList.add('on');
+  document.querySelectorAll('.nb').forEach(function(b){if(b.getAttribute('onclick').indexOf("'"+v+"'")>-1)b.classList.add('on');});
+  if(v==='dashboard')renderDash();
+  if(v==='cotizaciones')renderCots();
+  if(v==='catalogo')renderCatalogo();
+  if(v==='cotizador')llenarSelects();
+}
+function setTab(t){
+  ['auto','costo','manual'].forEach(function(x){
+    document.getElementById('modo-'+x).style.display=t===x?'block':'none';
+    document.getElementById('tab-'+x).classList.toggle('on',t===x);
+  });
+}
+
+function renderDash(){
+  document.getElementById('d-sub').textContent='Resumen operativo · '+hoy();
+  var apro=0,ingreso=0,utilidad=0;
+  cots.forEach(function(c){
+    if(ESTADOS_ACTIVOS.indexOf(c.estado)>-1){apro++;ingreso+=c.total||0;utilidad+=c.gananciaTotal||0;}
+  });
+  document.getElementById('k-cots').textContent=cots.length;
+  document.getElementById('k-apro').textContent=apro;
+  document.getElementById('k-ingreso').textContent='$'+fmt(ingreso);
+  document.getElementById('k-utilidad').textContent='$'+fmt(utilidad);
+  var html='';
+  cots.slice().reverse().slice(0,6).forEach(function(c){
+    html+='<tr><td><span class="fbadge">'+c.folio+'</span></td><td>'+c.cliente+'</td><td>'+c.fecha+'</td>'+
+      '<td style="color:#D4A830;font-weight:700">$'+fmt(c.total)+'</td><td>'+badge(c.estado)+'</td><td>'+badgeEnt(c)+'</td></tr>';
+  });
+  document.getElementById('d-tabla').innerHTML=html||'<tr><td colspan="6" style="color:#8A9BB5;text-align:center;padding:20px;">Sin cotizaciones aún</td></tr>';
+}
+
+function renderCatalogo(){
+  var grupos=[
+    {label:'BOPP Blanco',       ids:['bopp-bco-bri','bopp-bco-mat','bopp-bco-uv','bopp-bco-tac']},
+    {label:'BOPP Metalizado',   ids:['bopp-met-bri','bopp-met-mat','bopp-met-uv','bopp-met-tac']},
+    {label:'BOPP Transparente', ids:['bopp-tr-bri','bopp-tr-mat','bopp-tr-uv','bopp-tr-tac']},
+    {label:'Holográfico',       ids:['holo-bri','holo-uv','holo-tac']},
+  ];
+  var html='';
+  grupos.forEach(function(g){
+    html+='<div><div class="stit">'+g.label+'</div>';
+    g.ids.forEach(function(id){
+      var idx=MATERIALES.findIndex(function(m){return m.id===id;});if(idx<0)return;
+      var m=MATERIALES[idx];var acb=m.n.split('—')[1]||'';
+      html+='<div class="precio-row" id="row-m-'+idx+'">'+
+        '<div class="precio-info"><div class="pdot"></div><div class="pname">'+acb.trim()+'</div></div>'+
+        '<div class="precio-ctrl"><span class="precio-display" id="disp-m-'+idx+'">$'+m.p+'/m</span>'+
+        '<button class="btn-edit" onclick="editarP('+idx+')">&#9998; Editar</button></div></div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('lista-materiales').innerHTML=html;
+}
+function editarP(i){
+  var ctrl=document.querySelector('#row-m-'+i+' .precio-ctrl');
+  ctrl.innerHTML='<span style="font-size:11px;color:#888">$</span>'+
+    '<input class="input-precio" id="inp-m-'+i+'" type="number" value="'+MATERIALES[i].p+'" step="1" min="1" onkeydown="keyP(event,'+i+')">'+
+    '<span style="font-size:11px;color:#888">/m</span>'+
+    '<button class="btn-save" onclick="guardarP('+i+')">&#10003;</button>'+
+    '<button class="btn-cancel" onclick="renderCatalogo()">&#10005;</button>';
+  var inp=document.getElementById('inp-m-'+i);if(inp){inp.focus();inp.select();}
+}
+function keyP(e,i){if(e.key==='Enter')guardarP(i);if(e.key==='Escape')renderCatalogo();}
+function guardarP(i){
+  var inp=document.getElementById('inp-m-'+i);var v=parseFloat(inp.value);
+  if(isNaN(v)||v<=0){flash('Precio inválido');inp.focus();return;}
+  MATERIALES[i].p=v;llenarSelects();guardarLS();renderCatalogo();
+  flash('Precio actualizado: $'+v+'/m');
+}
+
+function llenarSelects(){
+  var sm=document.getElementById('c-mat');if(!sm)return;
+  var prev=sm.value;sm.innerHTML='';
+  MATERIALES.forEach(function(m){
+    var o=document.createElement('option');o.value=m.id;
+    o.textContent=m.n+' — $'+m.p+'/m';sm.appendChild(o);
+  });
+  if(prev)sm.value=prev;
+}
+
+// ── CÁLCULO AUTO (siempre lado corto al ancho) ─────────────────────────────
+function calcAuto(){
+  var corto=parseFloat(document.getElementById('c-a').value)||0;
+  var largo=parseFloat(document.getElementById('c-b').value)||0;
+  var qty=parseInt(document.getElementById('c-qty').value)||0;
+  var sube=parseFloat(document.getElementById('c-sube').value)||0;
+  var matId=document.getElementById('c-mat').value;
+  var el=document.getElementById('res-auto');
+  var btn=document.getElementById('btn-add-auto');
+  var mat=MATERIALES.find(function(m){return m.id===matId;});
+  if(!mat||!corto||!largo||!qty){el.innerHTML='<p class="hint" style="margin-top:10px;">Completa los campos</p>';btn.disabled=true;calcA=null;return;}
+  // Siempre lado corto al ancho
+  var et=Math.max(1,Math.floor(320/(corto+4)));
+  var paso=largo+5;
+  var mm=paso/et;
+  var costoU=mm*mat.p/1000;
+  var precioU=costoU+sube,ganU=sube;
+  var totalC=parseFloat((precioU*qty).toFixed(2)),costoT=parseFloat((costoU*qty).toFixed(2)),ganT=parseFloat((ganU*qty).toFixed(2));
+  calcA={a:corto,b:largo,qty:qty,mat:mat.n,costoU:costoU,sube:sube,precioU:precioU,ganU:ganU,totalC:totalC,costoT:costoT,ganT:ganT};
+  var html='<div class="res-box">'+
+    '<div class="rrow"><span class="rl">Etiquetas al ancho</span><span class="rv">'+et+' col. ('+corto+'mm al ancho)</span></div>'+
+    '<div class="rrow"><span class="rl">Paso del rollo</span><span class="rv">'+paso+' mm</span></div>'+
+    '<div class="rrow"><span class="rl">mm de material / etiqueta</span><span class="rv">'+mm.toFixed(2)+' mm</span></div>'+
+    '<div class="rrow"><span class="rl">Precio material</span><span class="rv">$'+mat.p+'/m</span></div>'+
+    '<div class="rrow"><span class="rl">Costo por etiqueta</span><span class="rv" style="font-weight:700;">'+fmtD(costoU)+'</span></div>';
+  if(sube>0){
+    html+='<div class="divhr"></div>'+
+      '<div class="rrow"><span class="rl">Le subo</span><span class="rv">'+fmtD(sube)+' / pza</span></div>'+
+      '<div class="rrow"><span class="rl">Precio al cliente</span><span class="ra">'+fmtD(precioU)+' / pza</span></div>'+
+      '<div class="rrow"><span class="rl">Ganancia por pieza</span><span class="rg">'+fmtD(ganU)+'</span></div>'+
+      '<div class="rrow"><span class="rl">Costo total</span><span class="rv">$'+fmt(costoT)+'</span></div>'+
+      '<div class="rrow"><span class="rl">Ganancia total</span><span class="rg">$'+fmt(ganT)+'</span></div>'+
+      '<div class="divhr"></div>'+
+      '<div class="trow"><span>Total al cliente</span><span class="tv">$'+fmt(totalC)+'</span></div>';
+    btn.disabled=false;
+  }else{
+    html+='<div class="warn-box">Ingresa cuánto le subes para ver el precio final</div>';
+    btn.disabled=true;
+  }
+  html+='</div>';el.innerHTML=html;renderPanel();
+}
+
+// ── CÁLCULO COSTO MANUAL ───────────────────────────────────────────────────
+function calcCosto(){
+  var costoU=parseFloat(document.getElementById('cm-costo').value)||0;
+  var sube=parseFloat(document.getElementById('cm-sube').value)||0;
+  var qty=parseInt(document.getElementById('cm-qty').value)||0;
+  var el=document.getElementById('res-costo');
+  var btn=document.getElementById('btn-add-costo');
+  if(!costoU||!qty){el.innerHTML='<p class="hint" style="margin-top:10px;">Ingresa el costo y cuánto le subes</p>';btn.disabled=true;calcC=null;return;}
+  var precioU=costoU+sube,ganU=sube;
+  var totalC=parseFloat((precioU*qty).toFixed(2)),costoT=parseFloat((costoU*qty).toFixed(2)),ganT=parseFloat((ganU*qty).toFixed(2));
+  calcC={qty:qty,costoU:costoU,sube:sube,precioU:precioU,ganU:ganU,totalC:totalC,costoT:costoT,ganT:ganT};
+  var html='<div class="res-box">'+
+    '<div class="rrow"><span class="rl">Costo por pieza</span><span class="rv" style="font-weight:700;">'+fmtD(costoU)+'</span></div>';
+  if(sube>0){
+    html+='<div class="divhr"></div>'+
+      '<div class="rrow"><span class="rl">Le subo</span><span class="rv">'+fmtD(sube)+' / pza</span></div>'+
+      '<div class="rrow"><span class="rl">Precio al cliente</span><span class="ra">'+fmtD(precioU)+' / pza</span></div>'+
+      '<div class="rrow"><span class="rl">Ganancia por pieza</span><span class="rg">'+fmtD(ganU)+'</span></div>'+
+      '<div class="rrow"><span class="rl">Costo total</span><span class="rv">$'+fmt(costoT)+'</span></div>'+
+      '<div class="rrow"><span class="rl">Ganancia total</span><span class="rg">$'+fmt(ganT)+'</span></div>'+
+      '<div class="divhr"></div>'+
+      '<div class="trow"><span>Total al cliente</span><span class="tv">$'+fmt(totalC)+'</span></div>';
+    btn.disabled=false;
+  }else{
+    html+='<div class="warn-box">Ingresa cuánto le subes para ver el precio final</div>';
+    btn.disabled=true;
+  }
+  html+='</div>';el.innerHTML=html;renderPanel();
+}
+
+// ── CÁLCULO MANUAL ─────────────────────────────────────────────────────────
+function calcManual(){
+  var qty=parseInt(document.getElementById('m-qty').value)||1;
+  var precio=parseFloat(document.getElementById('m-precio').value)||0;
+  var unidad=document.getElementById('m-unidad').value.trim()||'pza';
+  document.getElementById('m-precio-lbl').textContent=qty>1?'Precio por '+unidad+' ($) *':'Precio total ($) *';
+  var el=document.getElementById('res-manual');
+  if(!precio){el.innerHTML='<p class="hint" style="margin-top:10px;">Ingresa los datos para ver el total</p>';return;}
+  el.innerHTML='<div class="res-box">'+
+    '<div class="rrow"><span class="rl">Cantidad</span><span class="rv">'+qty+' '+unidad+'</span></div>'+
+    '<div class="rrow"><span class="rl">Precio'+(qty>1?' por '+unidad:'')+'</span><span class="ra">'+fmtD(precio)+'</span></div>'+
+    '<div class="divhr"></div>'+
+    '<div class="trow"><span>Total</span><span class="tv">$'+fmt(precio*qty)+'</span></div></div>';
+}
+
+function agregarAuto(){
+  if(!calcA||calcA.sube<=0)return;
+  var desc=document.getElementById('c-desc').value.trim();
+  items.push({tipo:'auto',desc:desc,mat:calcA.mat,tam:calcA.a+'×'+calcA.b,qty:calcA.qty,unidad:'pza',
+    precioU:calcA.precioU,ganU:calcA.ganU,precio:Math.round(calcA.precioU*calcA.qty*100)/100,ganT:calcA.ganT,costoT:calcA.costoT});
+  ['c-desc','c-a','c-b','c-qty','c-sube'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('res-auto').innerHTML='<p class="hint" style="margin-top:10px;">Completa los campos para ver el cálculo</p>';
+  document.getElementById('btn-add-auto').disabled=true;
+  calcA=null;renderPanel();flash('Ítem agregado');
+}
+
+function agregarCosto(){
+  if(!calcC||calcC.sube<=0)return;
+  var desc=document.getElementById('cm-desc').value.trim();
+  var mat=document.getElementById('cm-mat').value.trim();
+  var acb=document.getElementById('cm-acb').value.trim();
+  var tam=document.getElementById('cm-tam').value.trim();
+  var matStr=mat+(acb?' — '+acb:'');
+  items.push({tipo:'costo',desc:desc,mat:matStr,acb:acb,tam:tam,qty:calcC.qty,unidad:'pza',
+    precioU:calcC.precioU,ganU:calcC.ganU,precio:Math.round(calcC.precioU*calcC.qty*100)/100,ganT:calcC.ganT,costoT:calcC.costoT});
+  ['cm-desc','cm-mat','cm-acb','cm-tam','cm-qty','cm-costo','cm-sube'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('res-costo').innerHTML='<p class="hint" style="margin-top:10px;">Ingresa el costo y cuánto le subes</p>';
+  document.getElementById('btn-add-costo').disabled=true;
+  calcC=null;renderPanel();flash('Ítem agregado');
+}
+
+function agregarManual(){
+  var desc=document.getElementById('m-desc').value.trim();
+  var qty=parseInt(document.getElementById('m-qty').value)||1;
+  var precio=parseFloat(document.getElementById('m-precio').value)||0;
+  if(!desc){flash('Escribe una descripción');return;}
+  if(!precio){flash('Ingresa el precio');return;}
+  var mat=document.getElementById('m-mat').value.trim();
+  var acb=document.getElementById('m-acb').value.trim();
+  var tam=document.getElementById('m-unidad').value.trim()||'pza';
+  items.push({tipo:'manual',desc:desc,mat:mat,acb:acb,tam:tam,qty:qty,unidad:tam,
+    precioU:precio,ganU:precio,precio:parseFloat((precio*qty).toFixed(2)),ganT:parseFloat((precio*qty).toFixed(2)),costoT:0});
+  ['m-desc','m-mat','m-acb','m-unidad','m-qty','m-precio'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('res-manual').innerHTML='<p class="hint" style="margin-top:10px;">Ingresa los datos para ver el total</p>';
+  document.getElementById('m-precio-lbl').textContent='Precio total ($) *';
+  renderPanel();flash('Ítem agregado');
+}
+
+function quitarItem(i){items.splice(i,1);renderPanel();}
+
+function renderPanel(){
+  var sub=0,gan=0;
+  items.forEach(function(x){sub+=x.precio;gan+=x.ganT||0;});
+  var html='';
+  if(items.length===0){
+    html='<div class="card"><p class="hint">Agrega ítems para ver el resumen</p></div>';
+  }else{
+    var lista='';
+    items.forEach(function(x,i){
+      var b=x.tipo==='manual'?'<span class="ibadge ib-mn">Extra</span>':
+            x.tipo==='costo'?'<span class="ibadge ib-cm">Costo manual</span>':
+            '<span class="ibadge ib-et">Etiqueta</span>';
+      lista+='<div class="irow"><div><div class="iname">'+b+(x.desc||x.mat||'Ítem')+'</div>'+
+        '<div class="isub">'+(x.tam?x.tam+' · ':'')+x.qty.toLocaleString('es-MX')+' '+(x.unidad||'pza')+' · '+fmtD(x.precioU)+'</div></div>'+
+        '<div style="display:flex;align-items:center;"><span class="ipr">$'+fmt(x.precio)+'</span>'+
+        '<button class="btn-x" onclick="quitarItem('+i+')">&#10005;</button></div></div>';
+    });
+    html='<div class="card"><div class="ctit">Ítems en esta cotización</div>'+lista+
+      '<div class="divhr"></div>'+
+      '<div class="rrow"><span class="rl">Subtotal cliente</span><span class="ra">$'+fmt(sub)+'</span></div>'+
+      '<div class="rrow"><span class="rl">Ganancia estimada</span><span class="rg">$'+fmt(gan)+'</span></div>'+
+      '<button class="btn-gold" onclick="guardar()">&#128190; Guardar cotización</button></div>';
+  }
+  ['panel-r','panel-r-c','panel-r-m'].forEach(function(id){
+    var e=document.getElementById(id);if(e)e.innerHTML=html;
+  });
+}
+
+function guardar(){
+  var nombre=document.getElementById('c-nombre').value.trim();
+  if(!nombre){flash('Escribe el nombre del cliente');return;}
+  if(items.length===0){flash('Agrega al menos un ítem');return;}
+  var maxFolio=73;
+  cots.forEach(function(c){var n=parseInt((c.folio||'').replace('COT-',''));if(!isNaN(n)&&n>maxFolio)maxFolio=n;});
+  var folio='COT-'+String(maxFolio+1).padStart(3,'0');
+  var total=0,gananciaTotal=0;
+  items.forEach(function(x){total+=x.precio;gananciaTotal+=x.ganT||0;});
+  cots.push({id:folio,folio:folio,cliente:nombre,tel:document.getElementById('c-tel').value,
+    proyecto:document.getElementById('c-proyecto').value,fecha:hoy(),estado:'Pendiente',
+    total:total,gananciaTotal:gananciaTotal,items:items.slice()});
+  items=[];renderPanel();
+  ['c-nombre','c-tel','c-proyecto'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  guardarLS();flash('Cotización '+folio+' creada');ir('cotizaciones');
+}
+
+function renderCots(){
+  document.getElementById('cot-sub').textContent=cots.length+' cotizaciones registradas';
+  document.getElementById('cot-hoja').innerHTML='';
+  var html='<div class="card"><table><thead><tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Entrega</th><th>Acciones</th></tr></thead><tbody>';
+  cots.slice().reverse().forEach(function(c){
+    var opts='';ESTADOS.forEach(function(e){opts+='<option value="'+e+'"'+(e===c.estado?' selected':'')+'>'+e+'</option>';});
+    html+='<tr><td><span class="fbadge">'+c.folio+'</span></td><td>'+c.cliente+'</td><td>'+c.fecha+'</td>'+
+      '<td style="color:#D4A830;font-weight:700">$'+fmt(c.total)+'</td>'+
+      '<td><select class="sel-est" onchange="cambEst(\''+c.id+'\',this.value)">'+opts+'</select></td>'+
+      '<td>'+badgeEnt(c)+'</td>'+
+      '<td style="white-space:nowrap;"><button class="btn-ver" onclick="verHoja(\''+c.id+'\')">&#9432; Ver</button> <button class="btn-del" onclick="elimCot(\''+c.id+'\')">&#128465;</button></td></tr>';
+  });
+  html+='</tbody></table></div>';
+  document.getElementById('cot-lista').innerHTML=html;
+}
+function elimCot(id){if(!confirm('¿Eliminar esta cotización?'))return;cots=cots.filter(function(c){return c.id!==id;});guardarLS();renderDash();renderCots();flash('Cotización eliminada');}
+function cambEst(id,est){
+  cots.forEach(function(c){if(c.id===id){var a=c.estado;c.estado=est;if(est==='Aprobada'&&a!=='Aprobada')c.fechaAprobacion=hoy();}});
+  guardarLS();renderCots();renderDash();
+}
+
+function verHoja(id){
+  var c=cots.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById('cot-lista').style.display='none';
+  var B='border:1px solid #222;';
+  var filas='';var totalPzas=0;
+  (c.items||[]).forEach(function(x){
+    totalPzas+=x.qty||0;
+    var tam=x.tam||(x.a&&x.b?x.a+'×'+x.b:'');
+    var matStr=(x.mat||'').split('—')[0].trim();
+    var acbStr=(x.mat||'').indexOf('—')>-1?(x.mat||'').split('—')[1].trim():(x.acb||'');
+    filas+='<tr style="background:#fff;">'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;text-align:center;font-size:11px;">'+fmt(x.qty||0)+'</td>'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;text-align:center;font-size:11px;">'+tam+'</td>'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;font-size:11px;">'+(x.desc||'')+'</td>'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;text-align:center;font-size:10px;">'+matStr+'</td>'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;text-align:center;font-size:10px;">'+acbStr+'</td>'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;text-align:right;font-size:11px;">'+fmtD(x.precioU||0)+'</td>'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;text-align:right;font-size:11px;font-weight:700;">$'+fmt(x.precio||0)+'</td></tr>';
+  });
+  var filled=(c.items||[]).length;
+  for(var i=filled;i<10;i++){
+    filas+='<tr style="background:'+(i%2===0?'#f9f9f9':'#fff')+';">'+
+      '<td style="padding:5px 6px;border:1px solid #ddd;height:18px;"></td>'.repeat(7)+'</tr>';
+  }
+  filas+='<tr style="background:#1C2333;">'+
+    '<td style="padding:6px 8px;border:1px solid #444;font-size:12px;font-weight:800;color:#D4A830;text-align:center;">'+fmt(totalPzas)+'</td>'+
+    '<td colspan="4" style="padding:6px 8px;border:1px solid #444;font-size:11px;color:#D4A830;font-weight:700;text-align:right;">TOTAL PIEZAS</td>'+
+    '<td colspan="2" style="padding:6px 8px;border:1px solid #444;"></td></tr>';
+  var sub=c.total||0,iva=parseFloat((sub*0.16).toFixed(2)),tot=parseFloat((sub+iva).toFixed(2));
+  var html=
+    '<button class="btn-bk" onclick="volverCots()">&#8592; Volver</button>'+
+    '<div class="hoja-acciones">'+
+      '<button class="btn-pdf" onclick="window.print()">&#128424; Imprimir / Guardar PDF</button>'+
+      '<span style="font-size:12px;color:#8A9BB5;">Ctrl+P → Guardar como PDF</span>'+
+    '</div>'+
+    '<div class="card" id="hoja-contenido" style="font-family:Arial,sans-serif;padding:20px 24px;">'+
+    '<table style="width:100%;border-collapse:collapse;margin-bottom:10px;"><tr>'+
+      '<td style="width:105px;'+B+'padding:10px;text-align:center;vertical-align:middle;background:#1C2333;">'+
+        '<div style="font-size:30px;font-weight:900;color:#D4A830;line-height:1;">14</div>'+
+        '<div style="font-size:10px;font-weight:800;color:#D4A830;letter-spacing:2px;">14Ktorce</div>'+
+      '</td>'+
+      '<td style="'+B+'border-left:none;padding:8px 14px;vertical-align:top;">'+
+        '<div style="font-size:17px;font-weight:900;color:#1A1A2E;">14KTORCE ETIQUETAS</div>'+
+        '<div style="font-size:11px;color:#444;margin-top:3px;">Olmecas 116 Pte Col. Bugambilias 37270 León, Gto.</div>'+
+        '<div style="font-size:11px;color:#444;">WhatsApp 477 891-5586</div>'+
+        '<div style="font-size:11px;color:#1565C0;">neptali7110@gmail.com &nbsp; neptali.diaz@14ktorce.com</div>'+
+      '</td>'+
+      '<td style="width:200px;'+B+'border-left:none;padding:0;vertical-align:top;">'+
+        '<div style="background:#1C2333;color:#D4A830;font-size:13px;font-weight:900;text-align:center;padding:9px;letter-spacing:3px;">COTIZACION</div>'+
+        '<table style="width:100%;border-collapse:collapse;">'+
+          '<tr><td style="padding:6px 10px;border-top:1px solid #222;font-size:11px;font-weight:700;background:#f5f5f5;width:60px;">FECHA</td>'+
+          '<td style="padding:6px 10px;border-top:1px solid #222;border-left:1px solid #222;font-size:11px;">'+c.fecha+'</td></tr>'+
+          '<tr><td style="padding:6px 10px;border-top:1px solid #222;font-size:11px;font-weight:700;background:#f5f5f5;">No. ID</td>'+
+          '<td style="padding:6px 10px;border-top:1px solid #222;border-left:1px solid #222;font-size:11px;font-weight:800;color:#C0392B;">'+c.folio+'</td></tr>'+
+        '</table>'+
+      '</td>'+
+    '</tr></table>'+
+    '<table style="width:100%;border-collapse:collapse;margin-bottom:8px;"><tr>'+
+      '<td style="'+B+'padding:7px 10px;font-size:11px;font-weight:700;background:#f5f5f5;width:90px;">CLIENTE:</td>'+
+      '<td style="'+B+'border-left:none;padding:7px 10px;font-size:13px;font-weight:800;">'+c.cliente+'</td>'+
+      '<td style="'+B+'border-left:none;padding:7px 10px;font-size:11px;font-weight:700;background:#f5f5f5;width:80px;">TELÉFONO:</td>'+
+      '<td style="'+B+'border-left:none;padding:7px 10px;font-size:11px;">'+(c.tel||'')+'</td>'+
+    '</tr><tr>'+
+      '<td style="'+B+'border-top:none;padding:6px 10px;font-size:11px;font-weight:700;background:#f5f5f5;">PROYECTO:</td>'+
+      '<td colspan="3" style="'+B+'border-left:none;border-top:none;padding:6px 10px;font-size:11px;">'+(c.proyecto||'')+'</td>'+
+    '</tr></table>'+
+    '<table style="width:100%;border-collapse:collapse;">'+
+      '<thead><tr style="background:#1C2333;">'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:center;width:50px;">CANT.</th>'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:center;width:65px;">TAM / mm</th>'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:left;">DESCRIPCIÓN</th>'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:center;width:80px;">MATERIAL</th>'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:center;width:75px;">ACABADO</th>'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:right;width:80px;">PRECIO UNIT.</th>'+
+        '<th style="padding:8px 6px;border:1px solid #444;font-size:10px;color:#D4A830;text-align:right;width:80px;">TOTAL</th>'+
+      '</tr></thead><tbody>'+filas+'</tbody></table>'+
+    '<table style="width:100%;border-collapse:collapse;"><tr style="vertical-align:top;">'+
+      '<td style="border:1px solid #ddd;border-top:none;padding:10px 12px;width:60%;">'+
+        '<div style="font-size:11px;font-weight:800;color:#1A1A2E;margin-bottom:5px;">CONDICIONES COMERCIALES</div>'+
+        '<div style="font-size:10px;color:#333;line-height:1.9;">'+
+          '1. PRECIOS MAS IVA 16%<br>'+
+          '2. REQUISITOS DE COMPRA 50% ANTICIPO Y 50% CONTRA-ENTREGA<br>'+
+          '3. TIEMPO DE ENTREGA 9 DÍAS HÁBILES (LUN A VIER)<br>'+
+          '4. MUESTRA DE IMPRESIÓN DE SU ARCHIVO, GENERA COSTO DE $800 PESOS'+
+        '</div>'+
+        '<div style="font-size:10px;font-weight:800;color:#1A1A2E;margin-top:6px;">NOTA: EL CLIENTE DETERMINA EL MATERIAL Y ACABADO PARA LA APLICACIÓN DE SU IMPRESIÓN</div>'+
+      '</td>'+
+      '<td style="border:1px solid #ddd;border-top:none;border-left:none;padding:0;width:40%;">'+
+        '<table style="width:100%;border-collapse:collapse;">'+
+          '<tr><td style="padding:9px 14px;border-bottom:1px solid #ddd;font-size:12px;font-weight:700;background:#f5f5f5;">SUB-TOTAL</td>'+
+          '<td style="padding:9px 14px;border-bottom:1px solid #ddd;border-left:1px solid #ddd;font-size:12px;font-weight:700;text-align:right;">$'+fmt(sub)+'</td></tr>'+
+          '<tr><td style="padding:9px 14px;border-bottom:1px solid #ddd;font-size:12px;font-weight:700;background:#f5f5f5;">IVA 16%</td>'+
+          '<td style="padding:9px 14px;border-bottom:1px solid #ddd;border-left:1px solid #ddd;font-size:12px;font-weight:700;text-align:right;">$'+fmt(iva)+'</td></tr>'+
+          '<tr><td style="padding:9px 14px;font-size:13px;font-weight:900;background:#D4A830;color:#1A1A2E;">TOTAL</td>'+
+          '<td style="padding:9px 14px;border-left:1px solid #A0862A;font-size:13px;font-weight:900;text-align:right;background:#D4A830;color:#1A1A2E;">$'+fmt(tot)+'</td></tr>'+
+        '</table>'+
+      '</td>'+
+    '</tr></table>'+
+    '<div id="print-footer">14Ktorce Etiquetas · Olmecas 116 Pte, León, Gto. · WhatsApp 477 891-5586 · '+c.folio+' · '+c.fecha+'</div>'+
+    '</div>';
+  document.getElementById('cot-hoja').innerHTML=html;
+  document.getElementById('cot-sub').textContent='';
+}
+function volverCots(){document.getElementById('cot-lista').style.display='';document.getElementById('cot-hoja').innerHTML='';renderCots();}
+
+cargarLS();
+</script>
+</body>
+</html>
